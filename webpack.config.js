@@ -1,6 +1,6 @@
 const path = require("path");
 const HTMLPlugin = require("html-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin")
+const CopyPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 
 module.exports = {
@@ -29,11 +29,19 @@ module.exports = {
                     "css-loader"
                 ]
             },
+            // This rule is added to address the fully specified behavior
+            {
+                test: /\.m?js$/,
+                resolve: {
+                    fullySpecified: false, // disable the behavior
+                },
+            },
         ],
     },
     plugins: [
         new webpack.ProvidePlugin({
             process: 'process/browser',
+            Buffer: ['buffer', 'Buffer']
         }),
         new CopyPlugin({
             patterns: [
@@ -53,12 +61,15 @@ module.exports = {
             "os": require.resolve("os-browserify/browser"),
             "url": require.resolve("url/"),
             "process": require.resolve("process/browser"),
+            "vm": require.resolve("vm-browserify")
         }
     },
     output: {
         path: path.join(__dirname, "dist/js"),
         filename: "[name].js",
     },
+    // This part is added to ignore warnings about source maps
+    ignoreWarnings: [/Failed to parse source map/],
 };
 
 function getHtmlPlugins(chunks) {
